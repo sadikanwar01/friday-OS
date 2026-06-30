@@ -24,7 +24,6 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
-from typing import Optional
 
 from sqlalchemy import (
     Float,
@@ -42,10 +41,10 @@ from sqlalchemy.orm import (
     relationship,
 )
 
-
 # ---------------------------------------------------------------------------
 # UUID generator
 # ---------------------------------------------------------------------------
+
 
 def _generate_uuid() -> str:
     """Generate a new UUID4 string for use as a primary key default.
@@ -60,6 +59,7 @@ def _generate_uuid() -> str:
 # Declarative base
 # ---------------------------------------------------------------------------
 
+
 class Base(DeclarativeBase):
     """Shared declarative base for all FRIDAY OS models."""
 
@@ -69,6 +69,7 @@ class Base(DeclarativeBase):
 # ---------------------------------------------------------------------------
 # User
 # ---------------------------------------------------------------------------
+
 
 class User(Base):
     """A registered FRIDAY OS user.
@@ -92,7 +93,7 @@ class User(Base):
         default=_generate_uuid,
     )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    preferences_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    preferences_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     security_mode: Mapped[str] = mapped_column(
         String(20),
         nullable=False,
@@ -130,6 +131,7 @@ class User(Base):
 # Conversation
 # ---------------------------------------------------------------------------
 
+
 class Conversation(Base):
     """A conversation session between a user and FRIDAY.
 
@@ -158,8 +160,8 @@ class Conversation(Base):
         ForeignKey("users.id"),
         nullable=False,
     )
-    title: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
-    summary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    title: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    summary: Mapped[str | None] = mapped_column(Text, nullable=True)
     status: Mapped[str] = mapped_column(
         String(20),
         nullable=False,
@@ -202,6 +204,7 @@ class Conversation(Base):
 # Message
 # ---------------------------------------------------------------------------
 
+
 class Message(Base):
     """A single message within a conversation.
 
@@ -235,7 +238,7 @@ class Message(Base):
         nullable=False,
         default="text",
     )
-    metadata_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    metadata_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         default=func.now(),
         server_default=func.now(),
@@ -254,6 +257,7 @@ class Message(Base):
 # ---------------------------------------------------------------------------
 # Task
 # ---------------------------------------------------------------------------
+
 
 class Task(Base):
     """A work item tracked by the task pipeline.
@@ -289,24 +293,24 @@ class Task(Base):
         primary_key=True,
         default=_generate_uuid,
     )
-    conversation_id: Mapped[Optional[str]] = mapped_column(
+    conversation_id: Mapped[str | None] = mapped_column(
         String(36),
         ForeignKey("conversations.id"),
         nullable=True,
     )
-    parent_task_id: Mapped[Optional[str]] = mapped_column(
+    parent_task_id: Mapped[str | None] = mapped_column(
         String(36),
         ForeignKey("tasks.id"),
         nullable=True,
     )
     title: Mapped[str] = mapped_column(String(500), nullable=False)
-    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
     status: Mapped[str] = mapped_column(
         String(20),
         nullable=False,
         default="pending",
     )
-    assigned_agent: Mapped[Optional[str]] = mapped_column(
+    assigned_agent: Mapped[str | None] = mapped_column(
         String(100),
         nullable=True,
     )
@@ -315,21 +319,21 @@ class Task(Base):
         nullable=False,
         default="normal",
     )
-    result_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    result_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     retry_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     created_at: Mapped[datetime] = mapped_column(
         default=func.now(),
         server_default=func.now(),
     )
-    started_at: Mapped[Optional[datetime]] = mapped_column(nullable=True)
-    completed_at: Mapped[Optional[datetime]] = mapped_column(nullable=True)
+    started_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(nullable=True)
 
     # -- Relationships --------------------------------------------------------
-    conversation: Mapped[Optional[Conversation]] = relationship(
+    conversation: Mapped[Conversation | None] = relationship(
         "Conversation",
         back_populates="tasks",
     )
-    parent_task: Mapped[Optional[Task]] = relationship(
+    parent_task: Mapped[Task | None] = relationship(
         "Task",
         remote_side="Task.id",
         back_populates="subtasks",
@@ -354,6 +358,7 @@ class Task(Base):
 # ---------------------------------------------------------------------------
 # AgentLog
 # ---------------------------------------------------------------------------
+
 
 class AgentLog(Base):
     """Audit log entry for a single agent action within a task.
@@ -385,10 +390,10 @@ class AgentLog(Base):
     )
     agent_name: Mapped[str] = mapped_column(String(100), nullable=False)
     action: Mapped[str] = mapped_column(String(200), nullable=False)
-    input_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    output_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    input_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    output_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     status: Mapped[str] = mapped_column(String(20), nullable=False)
-    duration_seconds: Mapped[Optional[float]] = mapped_column(
+    duration_seconds: Mapped[float | None] = mapped_column(
         Float,
         nullable=True,
     )
@@ -404,15 +409,13 @@ class AgentLog(Base):
     )
 
     def __repr__(self) -> str:
-        return (
-            f"<AgentLog id={self.id!r} agent={self.agent_name!r} "
-            f"action={self.action!r}>"
-        )
+        return f"<AgentLog id={self.id!r} agent={self.agent_name!r} action={self.action!r}>"
 
 
 # ---------------------------------------------------------------------------
 # Memory
 # ---------------------------------------------------------------------------
+
 
 class Memory(Base):
     """Long-term memory entry for a user.
@@ -449,7 +452,7 @@ class Memory(Base):
     category: Mapped[str] = mapped_column(String(100), nullable=False)
     key: Mapped[str] = mapped_column(String(500), nullable=False)
     value: Mapped[str] = mapped_column(Text, nullable=False)
-    metadata_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    metadata_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     importance_score: Mapped[float] = mapped_column(
         Float,
         nullable=False,
@@ -485,6 +488,7 @@ class Memory(Base):
 # SecurityAudit
 # ---------------------------------------------------------------------------
 
+
 class SecurityAudit(Base):
     """Audit trail entry for a security decision.
 
@@ -506,10 +510,10 @@ class SecurityAudit(Base):
         default=_generate_uuid,
     )
     action_type: Mapped[str] = mapped_column(String(100), nullable=False)
-    action_detail: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    action_detail: Mapped[str | None] = mapped_column(Text, nullable=True)
     security_mode: Mapped[str] = mapped_column(String(20), nullable=False)
     decision: Mapped[str] = mapped_column(String(20), nullable=False)
-    reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         default=func.now(),
         server_default=func.now(),
@@ -517,14 +521,14 @@ class SecurityAudit(Base):
 
     def __repr__(self) -> str:
         return (
-            f"<SecurityAudit id={self.id!r} action={self.action_type!r} "
-            f"decision={self.decision!r}>"
+            f"<SecurityAudit id={self.id!r} action={self.action_type!r} decision={self.decision!r}>"
         )
 
 
 # ---------------------------------------------------------------------------
 # Setting
 # ---------------------------------------------------------------------------
+
 
 class Setting(Base):
     """A key/value application setting.

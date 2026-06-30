@@ -1,4 +1,5 @@
 """FRIDAY OS — Test Configuration and Fixtures."""
+
 import os
 
 # Set test environment BEFORE any project imports
@@ -6,13 +7,15 @@ os.environ["FRIDAY_APP_ENV"] = "testing"
 os.environ["FRIDAY_DB_URL"] = "sqlite+aiosqlite:///:memory:"
 os.environ["FRIDAY_APP_LOG_LEVEL"] = "WARNING"
 
+from collections.abc import AsyncGenerator
+
 import pytest
-from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
-    create_async_engine,
     async_sessionmaker,
+    create_async_engine,
 )
+
 from backend.database.models import Base
 
 

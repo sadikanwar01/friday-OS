@@ -13,7 +13,7 @@ Usage::
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 import orjson
@@ -34,7 +34,7 @@ def _utcnow() -> datetime:
     Returns:
         A timezone-aware UTC :class:`datetime`.
     """
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 class TaskRepository:

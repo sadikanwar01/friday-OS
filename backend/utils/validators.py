@@ -23,10 +23,10 @@ from urllib.parse import urlparse
 
 from backend.utils.exceptions import FridayValidationError
 
-
 # ---------------------------------------------------------------------------
 # String / value validators
 # ---------------------------------------------------------------------------
+
 
 def validate_not_empty(value: str, field_name: str) -> str:
     """Validate that *value* is a non-empty string after stripping whitespace.
@@ -73,10 +73,7 @@ def validate_enum_value(value: str, allowed: list[str], field_name: str) -> str:
     """
     if value not in allowed:
         raise FridayValidationError(
-            message=(
-                f"Invalid value '{value}' for '{field_name}'. "
-                f"Allowed: {', '.join(allowed)}"
-            ),
+            message=(f"Invalid value '{value}' for '{field_name}'. Allowed: {', '.join(allowed)}"),
             error_code="VALIDATION_ENUM",
             details={"field": field_name, "value": value, "allowed": allowed},
         )
@@ -86,6 +83,7 @@ def validate_enum_value(value: str, allowed: list[str], field_name: str) -> str:
 # ---------------------------------------------------------------------------
 # Path / file validators
 # ---------------------------------------------------------------------------
+
 
 def validate_path_safe(path: str) -> Path:
     """Validate that *path* does not contain directory-traversal sequences.
@@ -156,8 +154,7 @@ def validate_file_extension(filename: str, allowed_extensions: list[str]) -> str
 
     # Normalise allowed extensions to include leading dot, lowercase
     normalised_allowed = [
-        ext.lower() if ext.startswith(".") else f".{ext.lower()}"
-        for ext in allowed_extensions
+        ext.lower() if ext.startswith(".") else f".{ext.lower()}" for ext in allowed_extensions
     ]
 
     suffix = Path(filename).suffix.lower()
@@ -180,6 +177,7 @@ def validate_file_extension(filename: str, allowed_extensions: list[str]) -> str
 # ---------------------------------------------------------------------------
 # Network validators
 # ---------------------------------------------------------------------------
+
 
 def validate_url(url: str) -> str:
     """Validate that *url* is a well-formed HTTP or HTTPS URL.
@@ -250,6 +248,7 @@ def validate_port(port: int) -> int:
 # ---------------------------------------------------------------------------
 # JSON validator
 # ---------------------------------------------------------------------------
+
 
 def validate_json_string(value: str) -> dict[str, Any]:
     """Parse and validate a JSON string, returning the decoded object.

@@ -21,10 +21,10 @@ from __future__ import annotations
 
 from typing import Any
 
-
 # ---------------------------------------------------------------------------
 # Base exception
 # ---------------------------------------------------------------------------
+
 
 class FridayError(Exception):
     """Base exception for all FRIDAY OS errors.
@@ -83,6 +83,7 @@ class FridayError(Exception):
 # Configuration
 # ---------------------------------------------------------------------------
 
+
 class ConfigurationError(FridayError):
     """Raised when loading or validating configuration fails.
 
@@ -102,6 +103,7 @@ class ConfigurationError(FridayError):
 # ---------------------------------------------------------------------------
 # Database
 # ---------------------------------------------------------------------------
+
 
 class DatabaseError(FridayError):
     """Raised when a database operation fails.
@@ -139,6 +141,7 @@ class FridayConnectionError(FridayError):
 # Validation
 # ---------------------------------------------------------------------------
 
+
 class FridayValidationError(FridayError):
     """Raised when input validation fails.
 
@@ -158,6 +161,7 @@ class FridayValidationError(FridayError):
 # ---------------------------------------------------------------------------
 # Agent / Task
 # ---------------------------------------------------------------------------
+
 
 class AgentError(FridayError):
     """Raised when an agent encounters an execution error.
@@ -233,6 +237,7 @@ class TaskError(FridayError):
 # Security
 # ---------------------------------------------------------------------------
 
+
 class FridaySecurityError(FridayError):
     """Raised when a security policy is violated.
 
@@ -280,6 +285,7 @@ class FridaySecurityError(FridayError):
 # LLM
 # ---------------------------------------------------------------------------
 
+
 class LLMError(FridayError):
     """Raised when an LLM provider returns an error.
 
@@ -318,6 +324,7 @@ class LLMError(FridayError):
 # ---------------------------------------------------------------------------
 # Voice / Automation / Browser
 # ---------------------------------------------------------------------------
+
 
 class VoiceError(FridayError):
     """Raised when the voice subsystem (STT / TTS) encounters an error."""
@@ -359,6 +366,7 @@ class BrowserError(FridayError):
 # File operations
 # ---------------------------------------------------------------------------
 
+
 class FileOperationError(FridayError):
     """Raised when a filesystem operation fails.
 
@@ -397,6 +405,7 @@ class FileOperationError(FridayError):
 # ---------------------------------------------------------------------------
 # Retry
 # ---------------------------------------------------------------------------
+
 
 class RetryExhaustedError(FridayError):
     """Raised when all retry attempts have been exhausted.

@@ -15,13 +15,13 @@ Usage::
 from __future__ import annotations
 
 import traceback
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
-
 
 # ---------------------------------------------------------------------------
 # Timestamp / Duration / Size
 # ---------------------------------------------------------------------------
+
 
 def format_timestamp(dt: datetime | None = None) -> str:
     """Return an ISO-8601 formatted timestamp string.
@@ -35,7 +35,7 @@ def format_timestamp(dt: datetime | None = None) -> str:
         An ISO-8601 string (e.g. ``"2026-06-29T20:30:00+00:00"``).
     """
     if dt is None:
-        dt = datetime.now(tz=timezone.utc)
+        dt = datetime.now(tz=UTC)
     return dt.isoformat()
 
 
@@ -109,6 +109,7 @@ def format_file_size(size_bytes: int) -> str:
 # API response helpers
 # ---------------------------------------------------------------------------
 
+
 def format_error(error: Exception) -> dict[str, Any]:
     """Build a standardised error-response dictionary from an exception.
 
@@ -159,6 +160,7 @@ def format_success(data: Any = None, message: str = "Success") -> dict[str, Any]
 # Status helpers
 # ---------------------------------------------------------------------------
 
+
 def format_task_status(status: str, progress: float = 0.0) -> dict[str, Any]:
     """Build a task-status response dictionary.
 
@@ -206,6 +208,7 @@ def format_agent_status(
 # Text helpers
 # ---------------------------------------------------------------------------
 
+
 def truncate_text(
     text: str,
     max_length: int = 200,
@@ -234,6 +237,7 @@ def truncate_text(
 # ---------------------------------------------------------------------------
 # Log entry formatting
 # ---------------------------------------------------------------------------
+
 
 def format_log_entry(
     level: str,

@@ -81,11 +81,7 @@ class SettingsRepository:
             DatabaseError: If the query fails.
         """
         try:
-            stmt = (
-                select(Setting)
-                .where(Setting.category == category)
-                .order_by(Setting.key.asc())
-            )
+            stmt = select(Setting).where(Setting.category == category).order_by(Setting.key.asc())
             result = await self._session.execute(stmt)
             return list(result.scalars().all())
         except Exception as exc:

@@ -45,6 +45,7 @@ _session_factory: async_sessionmaker[AsyncSession] | None = None
 # Engine
 # ---------------------------------------------------------------------------
 
+
 def get_engine() -> AsyncEngine:
     """Return the singleton async SQLAlchemy engine.
 
@@ -102,6 +103,7 @@ def get_engine() -> AsyncEngine:
 # Session factory
 # ---------------------------------------------------------------------------
 
+
 def get_session_factory() -> async_sessionmaker[AsyncSession]:
     """Return the singleton async session factory.
 
@@ -145,6 +147,7 @@ def get_session_factory() -> async_sessionmaker[AsyncSession]:
 # Session generator (for dependency injection / context managers)
 # ---------------------------------------------------------------------------
 
+
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     """Yield an async database session with automatic commit/rollback.
 
@@ -179,6 +182,7 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
 # ---------------------------------------------------------------------------
 # Database lifecycle
 # ---------------------------------------------------------------------------
+
 
 async def init_database() -> None:
     """Create all tables defined in the ORM models.
@@ -239,6 +243,7 @@ async def close_database() -> None:
 # ---------------------------------------------------------------------------
 # Module-level convenience alias
 # ---------------------------------------------------------------------------
+
 
 def async_session_factory() -> AsyncSession:
     """Convenience callable that creates a new session from the factory.

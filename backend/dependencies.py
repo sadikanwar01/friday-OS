@@ -19,7 +19,8 @@ Usage in a FastAPI route::
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, AsyncGenerator
+from collections.abc import AsyncGenerator
+from typing import TYPE_CHECKING
 
 from backend.config import Settings, get_settings
 

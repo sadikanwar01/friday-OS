@@ -19,10 +19,11 @@ import asyncio
 import hashlib
 import time
 import uuid
+from collections.abc import AsyncGenerator, Callable
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, AsyncGenerator, Callable, TypeVar
+from typing import Any, TypeVar
 
 import aiofiles
 import orjson
@@ -35,6 +36,7 @@ T = TypeVar("T")
 # ---------------------------------------------------------------------------
 # ID / Timestamp
 # ---------------------------------------------------------------------------
+
 
 def generate_id() -> str:
     """Generate a random UUID4 string.
@@ -51,12 +53,13 @@ def get_timestamp() -> datetime:
     Returns:
         :class:`~datetime.datetime` with ``tzinfo=timezone.utc``.
     """
-    return datetime.now(tz=timezone.utc)
+    return datetime.now(tz=UTC)
 
 
 # ---------------------------------------------------------------------------
 # Filesystem
 # ---------------------------------------------------------------------------
+
 
 def ensure_directory(path: Path) -> Path:
     """Create *path* (and parents) if it does not already exist.
@@ -84,7 +87,7 @@ async def read_file_async(path: Path) -> str:
         FileOperationError: If the file cannot be read.
     """
     try:
-        async with aiofiles.open(path, mode="r", encoding="utf-8") as fh:
+        async with aiofiles.open(path, encoding="utf-8") as fh:
             return await fh.read()
     except FileNotFoundError as exc:
         raise FileOperationError(
@@ -140,6 +143,7 @@ async def write_file_async(path: Path, content: str) -> None:
 # JSON helpers (orjson-backed)
 # ---------------------------------------------------------------------------
 
+
 def safe_json_loads(text: str, default: Any = None) -> Any:
     """Parse a JSON string, returning *default* on failure.
 
@@ -184,6 +188,7 @@ def safe_json_dumps(data: Any, pretty: bool = False) -> str:
 # Hashing
 # ---------------------------------------------------------------------------
 
+
 def calculate_hash(content: str) -> str:
     """Compute the SHA-256 hex digest of *content*.
 
@@ -199,6 +204,7 @@ def calculate_hash(content: str) -> str:
 # ---------------------------------------------------------------------------
 # Retry
 # ---------------------------------------------------------------------------
+
 
 async def retry_async(
     func: Callable[..., Any],
@@ -248,6 +254,7 @@ async def retry_async(
 # Collection utilities
 # ---------------------------------------------------------------------------
 
+
 def chunk_list(lst: list[Any], chunk_size: int) -> list[list[Any]]:
     """Split *lst* into sub-lists of at most *chunk_size* elements.
 
@@ -281,11 +288,7 @@ def deep_merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]
     """
     merged: dict[str, Any] = {**base}
     for key, value in override.items():
-        if (
-            key in merged
-            and isinstance(merged[key], dict)
-            and isinstance(value, dict)
-        ):
+        if key in merged and isinstance(merged[key], dict) and isinstance(value, dict):
             merged[key] = deep_merge(merged[key], value)
         else:
             merged[key] = value
@@ -295,6 +298,7 @@ def deep_merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]
 # ---------------------------------------------------------------------------
 # Timing
 # ---------------------------------------------------------------------------
+
 
 @asynccontextmanager
 async def measure_time() -> AsyncGenerator[dict[str, float], None]:

@@ -18,14 +18,14 @@ from __future__ import annotations
 
 import logging
 import sys
+from collections.abc import Generator
 from contextlib import contextmanager
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from typing import Any, Generator
+from typing import Any
 
 import structlog
 from structlog.types import Processor
-
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -48,6 +48,7 @@ _VALID_LOG_LEVELS: dict[str, int] = {
 # ---------------------------------------------------------------------------
 # Shared processors
 # ---------------------------------------------------------------------------
+
 
 def _build_shared_processors() -> list[Processor]:
     """Return the shared structlog processor chain."""
@@ -75,6 +76,7 @@ def _build_shared_processors() -> list[Processor]:
 # Public API
 # ---------------------------------------------------------------------------
 
+
 def setup_logging(
     log_level: str = "INFO",
     log_dir: Path | None = None,
@@ -96,8 +98,7 @@ def setup_logging(
     level_name = log_level.upper()
     if level_name not in _VALID_LOG_LEVELS:
         raise ValueError(
-            f"Invalid log level '{log_level}'. "
-            f"Valid levels: {', '.join(_VALID_LOG_LEVELS)}"
+            f"Invalid log level '{log_level}'. Valid levels: {', '.join(_VALID_LOG_LEVELS)}"
         )
     numeric_level: int = _VALID_LOG_LEVELS[level_name]
 
@@ -138,6 +139,7 @@ def setup_logging(
         # Import colorama and initialise for Windows ANSI support
         try:
             import colorama  # noqa: F811
+
             colorama.just_fix_windows_console()
         except ImportError:
             pass
@@ -184,6 +186,7 @@ def get_logger(name: str) -> structlog.stdlib.BoundLogger:
 # ---------------------------------------------------------------------------
 # LogContext — add fields for a block of code
 # ---------------------------------------------------------------------------
+
 
 class LogContext:
     """Context manager that binds extra fields to **all** structlog loggers

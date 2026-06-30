@@ -7,13 +7,13 @@ Provides a health-check endpoint and initialises the database on startup.
 
 from __future__ import annotations
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 from fastapi import FastAPI
 
 from backend.config import get_settings
-from backend.database.engine import init_database, close_database
+from backend.database.engine import close_database, init_database
 from backend.utils.logger import get_logger
 
 logger = get_logger(__name__)

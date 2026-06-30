@@ -18,7 +18,7 @@ Usage::
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import orjson
 from sqlalchemy import select
@@ -37,7 +37,7 @@ def _utcnow() -> datetime:
     Returns:
         A timezone-aware UTC :class:`datetime`.
     """
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 class MemoryRepository:
@@ -183,10 +183,7 @@ class MemoryRepository:
             DatabaseError: If the query fails.
         """
         try:
-            stmt = (
-                select(Memory)
-                .where(Memory.user_id == user_id, Memory.key == key)
-            )
+            stmt = select(Memory).where(Memory.user_id == user_id, Memory.key == key)
             result = await self._session.execute(stmt)
             return result.scalar_one_or_none()
         except Exception as exc:
