@@ -26,3 +26,5 @@ playwright==1.61.0
 pyautogui==0.9.54
 
 numpy==1.26.4
+
+Jinja2==3.1.6
