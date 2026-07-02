@@ -25,7 +25,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, TypeVar
 
-import aiofiles
+import aiofiles  # type: ignore
 import orjson
 
 from backend.utils.exceptions import FileOperationError, RetryExhaustedError

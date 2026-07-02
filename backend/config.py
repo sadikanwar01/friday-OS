@@ -18,9 +18,9 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import ClassVar
+from typing import Any, ClassVar
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # ---------------------------------------------------------------------------
@@ -30,6 +30,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 _VALID_ENVIRONMENTS: frozenset[str] = frozenset({"development", "staging", "production", "testing"})
 _VALID_LOG_LEVELS: frozenset[str] = frozenset({"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"})
 _VALID_SECURITY_MODES: frozenset[str] = frozenset({"safe", "confirm", "auto"})
+_VALID_VOICE_MODES: frozenset[str] = frozenset({"wake_word", "push_to_talk"})
 
 
 # ---------------------------------------------------------------------------
@@ -119,6 +120,26 @@ class Settings(BaseSettings):
         description="Secret key for signing tokens and sessions.",
     )
 
+    # ── LLM ─────────────────────────────────────────────────────────────
+    default_provider: str = Field(
+        default="gemini",
+        description="Default LLM provider (ollama | gemini).",
+    )
+    llm_model: str = Field(
+        default="", # Set dynamically in __init__ if empty
+        description="Default LLM model to use system-wide.",
+    )
+
+    # ── LLM (Gemini) ────────────────────────────────────────────────────
+    gemini_api_key: str | None = Field(
+        default=None,
+        description="API key for Google Gemini.",
+    )
+    gemini_model: str = Field(
+        default="gemini-2.5-pro",
+        description="Default Gemini model to use.",
+    )
+
     # ── LLM (Ollama) ────────────────────────────────────────────────────
     ollama_base_url: str = Field(
         default="http://localhost:11434",
@@ -133,6 +154,11 @@ class Settings(BaseSettings):
         ge=1,
         description="Request timeout in seconds for Ollama calls.",
     )
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if not self.llm_model:
+            self.llm_model = self.gemini_model if self.default_provider == "gemini" else self.ollama_model
 
     # ── Voice ────────────────────────────────────────────────────────────
     voice_wake_word: str = Field(
@@ -150,6 +176,14 @@ class Settings(BaseSettings):
     voice_language: str = Field(
         default="en",
         description="Primary language code for voice interactions.",
+    )
+    voice_mode: str = Field(
+        default="wake_word",
+        description="Operating mode (wake_word | push_to_talk).",
+    )
+    safety_mode: str = Field(
+        default="confirm",
+        description="Automation safety mode (safe | confirm | auto).",
     )
 
     # ── Paths ────────────────────────────────────────────────────────────
@@ -174,10 +208,32 @@ class Settings(BaseSettings):
     VALID_ENVIRONMENTS: ClassVar[frozenset[str]] = _VALID_ENVIRONMENTS
     VALID_LOG_LEVELS: ClassVar[frozenset[str]] = _VALID_LOG_LEVELS
     VALID_SECURITY_MODES: ClassVar[frozenset[str]] = _VALID_SECURITY_MODES
+    VALID_VOICE_MODES: ClassVar[frozenset[str]] = _VALID_VOICE_MODES
 
     # ------------------------------------------------------------------
     # Validators
     # ------------------------------------------------------------------
+
+    @model_validator(mode="before")
+    @classmethod
+    def load_unprefixed_env_vars(cls, data: dict[str, Any]) -> dict[str, Any]:
+        """Support explicitly required unprefixed env vars."""
+        import os
+
+        from dotenv import load_dotenv
+        load_dotenv(override=True)
+
+        mapping = {
+            "GEMINI_API_KEY": "gemini_api_key",
+            "DEFAULT_PROVIDER": "default_provider",
+            "GEMINI_MODEL": "gemini_model",
+        }
+
+        for env_var, field_name in mapping.items():
+            if env_var in os.environ and field_name not in data:
+                data[field_name] = os.environ[env_var]
+
+        return data
 
     @field_validator("app_env")
     @classmethod
@@ -214,6 +270,19 @@ class Settings(BaseSettings):
             msg = (
                 f"Invalid security mode '{value}'. "
                 f"Must be one of: {', '.join(sorted(_VALID_SECURITY_MODES))}"
+            )
+            raise ValueError(msg)
+        return normalised
+
+    @field_validator("voice_mode")
+    @classmethod
+    def _validate_voice_mode(cls, value: str) -> str:
+        """Ensure the voice mode is one of the allowed values."""
+        normalised = value.strip().lower()
+        if normalised not in _VALID_VOICE_MODES:
+            msg = (
+                f"Invalid voice mode '{value}'. "
+                f"Must be one of: {', '.join(sorted(_VALID_VOICE_MODES))}"
             )
             raise ValueError(msg)
         return normalised

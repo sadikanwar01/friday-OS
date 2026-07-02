@@ -138,7 +138,7 @@ def setup_logging(
     else:
         # Import colorama and initialise for Windows ANSI support
         try:
-            import colorama  # noqa: F811
+            import colorama  # type: ignore  # noqa: F811
 
             colorama.just_fix_windows_console()
         except ImportError:
